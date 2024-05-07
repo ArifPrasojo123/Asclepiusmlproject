@@ -24,5 +24,17 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="@string/result" />
+
+        <TextView
+            android:id="@+id/tvConfidence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#BFFFFFFF"
+            android:lines="3"
+            android:maxLines="3"
+            android:padding="16dp"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            tools:text="@string/confidence_score"/>
     </LinearLayout>
 </ScrollView>

@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             currentImageUri?.let {
                 analyzeImage()
             } ?: run {
-                showToast(getString(R.string.image_classifier_failed))
+                showToast(getString(R.string.empty_image_warning))
             }
         }
     }

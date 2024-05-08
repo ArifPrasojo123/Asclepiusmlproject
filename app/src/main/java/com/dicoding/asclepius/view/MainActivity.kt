@@ -6,18 +6,26 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.dicoding.asclepius.R
 import com.dicoding.asclepius.databinding.ActivityMainBinding
+import com.dicoding.asclepius.helper.ImageClassifierHelper
+import org.tensorflow.lite.task.vision.classifier.Classifications
+import java.text.NumberFormat
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private var currentImageUri: Uri? = null
+
+    private var predictionScore: String = ""
+
+    private var predictionResult: String = ""
+
+    private lateinit var imageClassifierHelper: ImageClassifierHelper
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -46,13 +54,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.galleryButton.setOnClickListener { startGallery() }
-        binding.analyzeButton.setOnClickListener {
-            currentImageUri?.let {
-                analyzeImage()
-            } ?: run {
-                showToast(getString(R.string.empty_image_warning))
+        binding.analyzeButton.setOnClickListener { analyzeImage() }
+
+        imageClassifierHelper = ImageClassifierHelper(context = this, classifierListener = object : ImageClassifierHelper.ClassifierListener {
+            override fun onError(error: String) {
+                showToast(error)
             }
-        }
+
+            override fun onResults(results: List<Classifications>?, confidence: String) {
+                generateResult(results)
+            }
+        })
     }
 
     private fun startGallery() {
@@ -63,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     private val launcherGallery = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) {uri: Uri? ->
-        if (uri != null) {
+        uri?.let {
             currentImageUri = uri
             showImage()
         }
@@ -72,21 +84,40 @@ class MainActivity : AppCompatActivity() {
     private fun showImage() {
         // TODO: Menampilkan gambar sesuai Gallery yang dipilih.
         currentImageUri?.let {
-            Log.d("Image URI", "show Image: $it")
             binding.previewImageView.setImageURI(it)
         }
     }
 
     private fun analyzeImage() {
         // TODO: Menganalisa gambar yang berhasil ditampilkan.
-        val intent = Intent (this, ResultActivity::class.java)
-        intent.putExtra(ResultActivity.EXTRA_IMAGE_URI, currentImageUri.toString())
-        startActivity(intent)
+        if (currentImageUri == null){
+            currentImageUri?.let {
+                imageClassifierHelper.classifyStaticImage(it)
+            }
+        } else {
+            showToast("Image Classifier not Initialized")
+        }
     }
 
     private fun moveToResult() {
-        val intent = Intent(this, ResultActivity::class.java)
+        val intent = Intent(this, ResultActivity::class.java).apply {
+            putExtra(ResultActivity.EXTRA_IMAGE_URI, currentImageUri.toString())
+            putExtra(ResultActivity.EXTRA_PREDICTION_RESULT, predictionResult)
+            putExtra(ResultActivity.EXTRA_PREDICTION_SCORE, predictionScore)
+        }
         startActivity(intent)
+    }
+
+    private fun generateResult(data: List<Classifications>?) {
+        data?.let { it ->
+            if (it.isNotEmpty() && it[0].categories.isNotEmpty()) {
+                val highestResult = it[0].categories.maxBy { it?.score ?: 0.0f }
+                val predictionResult = highestResult.label
+                val predictionScore = NumberFormat.getPercentInstance().format(highestResult.score)
+
+                moveToResult()
+            }
+        }
     }
 
     private fun showToast(message: String) {

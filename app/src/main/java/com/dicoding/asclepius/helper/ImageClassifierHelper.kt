@@ -63,7 +63,7 @@ class ImageClassifierHelper(
             .add(ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
             .add(CastOp(DataType.FLOAT32))
             .build()
-        val tensorImage: TensorImage? = null
+        val tensorImage = TensorImage(DataType.FLOAT32)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val source = ImageDecoder.createSource(context.contentResolver, imageUri)
@@ -71,7 +71,7 @@ class ImageClassifierHelper(
         } else {
             MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
         }.copy(Bitmap.Config.ARGB_8888, true)?.let { bitmap ->
-            val tensorImage = imageProcessor.process(TensorImage.fromBitmap(bitmap))
+             imageProcessor.process(TensorImage.fromBitmap(bitmap))
         }
         val imageProcessingOptions = ImageProcessingOptions.builder()
             .build()

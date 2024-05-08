@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.dicoding.asclepius.R
 import com.dicoding.asclepius.databinding.ActivityMainBinding
 import com.dicoding.asclepius.helper.ImageClassifierHelper
 import org.tensorflow.lite.task.vision.classifier.Classifications
@@ -112,8 +111,8 @@ class MainActivity : AppCompatActivity() {
         data?.let { it ->
             if (it.isNotEmpty() && it[0].categories.isNotEmpty()) {
                 val highestResult = it[0].categories.maxBy { it?.score ?: 0.0f }
-                val predictionResult = highestResult.label
-                val predictionScore = NumberFormat.getPercentInstance().format(highestResult.score)
+                predictionResult = highestResult.label
+                predictionScore = NumberFormat.getPercentInstance().format(highestResult.score)
 
                 moveToResult()
             }

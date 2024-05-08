@@ -20,6 +20,12 @@ class ResultActivity : AppCompatActivity() {
             Log.d("Image URI", "showImage: $it")
             binding.resultImage.setImageURI(it)
         }
+
+        val predictionResult = intent.getStringExtra(EXTRA_PREDICTION_RESULT)
+        val predictionScore = intent.getStringExtra(EXTRA_PREDICTION_SCORE)
+
+        binding.tvPrediction.text = predictionResult
+        binding.tvConfidence.text = predictionScore
     }
 
     companion object {

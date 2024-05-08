@@ -63,9 +63,9 @@ class ImageClassifierHelper(
             .add(ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
             .add(CastOp(DataType.FLOAT32))
             .build()
-        val tensorImage = TensorImage(DataType.FLOAT32)
+        //val tensorImage = TensorImage(DataType.FLOAT32)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        val tensorImage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val source = ImageDecoder.createSource(context.contentResolver, imageUri)
             ImageDecoder.decodeBitmap(source)
         } else {

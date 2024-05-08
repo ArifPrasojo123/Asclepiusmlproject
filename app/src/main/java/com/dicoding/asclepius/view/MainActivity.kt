@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun analyzeImage() {
         // TODO: Menganalisa gambar yang berhasil ditampilkan.
-        if (currentImageUri == null){
+        if (currentImageUri != null){
             currentImageUri?.let {
                 imageClassifierHelper.classifyStaticImage(it)
             }
